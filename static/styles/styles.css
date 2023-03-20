@@ -1,0 +1,125 @@
+.plot-picture{
+    height: 300;
+    width : 300;
+}
+/* Container */
+.container-fluid{
+    padding: 2% 4%;
+}
+
+/* Navbar */
+.navbar{
+    border : 0
+}
+.navbar-heading{
+    background-color: #FA7070;
+}
+
+.navbar-text{
+    color : #ffffff;
+    padding: 10px 3%;
+}
+
+.nav-item{
+    margin : 0 3%;
+}
+/* FontAwesome */
+.icon::before {
+    /* removed font- based rules */
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Underline-Hover-Animation */
+.underline-animation{
+    display: inline-block;
+    position: relative;;
+}
+
+.underline-animation::after{
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #000000;
+    transform-origin: bottom right;
+    transition: transform 0.03s ease-out;
+}
+
+.underline-animation:hover::after{
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+ /* SideBar */
+ .sidebar{
+    overflow-y: auto;
+    max-height: 350px;
+ }
+
+.databases, .tables, .keys{
+    list-style-type: none;
+}
+
+.database::before{
+    font : var(--fa-font-solid);
+    content : "\f061";
+    margin-right: 0.3rem;
+}
+
+.table::before{
+    font : var(--fa-font-solid);
+    content : "\f009";
+    margin-right: 0.3rem;
+    transform : 0;
+}
+
+.key::before{
+    font : var(--fa-font-solid);
+    content: "\f084";
+    margin-right: 0.5rem;
+}
+
+.tree{
+    cursor: pointer;
+    user-select: none;
+}
+
+
+.tree-toggle::before{
+    transform : rotate(90deg);
+}
+
+.tree-node{
+    display: none;
+}
+
+.tree-node-active{
+    display: block;
+}l
+
+/* TextBox */
+.textbox{
+    margin : 0 2%;
+}
+
+/* Queries */
+.keyword{
+    margin-left: 5%;
+    padding : 0 3px;
+    border-radius: 7%;
+}
+.has-annotation{
+    background-color: #A1C298 ;
+}
+.sql-query{
+    display : none;
+}
+
+/* Annotation */
+.hidden{
+    display : none;
+}

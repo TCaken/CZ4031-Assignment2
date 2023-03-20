@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link href="{{ url_for('static', filename='/styles/styles.css'  )   }}" type= "text/css" rel="stylesheet">
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+    <!-- FontAwesome Icons-->
+    <script src="https://kit.fontawesome.com/74d19fc357.js" crossorigin="anonymous"></script>
+
+    <title>CZ4031 : Query Visualizer</title>
+</head>
+<body>
+    <script>
+        function myFunction() {
+          document.getElementById("demo").style.color = "red";
+        }
+    </script>
+
+    <nav class="navbar navbar-expand-md navbar-heading">
+        <span class="navbar-brand navbar-text mb-0"> CZ4031 : Project 2</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+            </ul>
+        </div>
+    </nav>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %} 
+    {% for category, message in messages %} 
+    {% if category == 'error' %}
+    <div class="alert alert-danger alter-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" style="border-style : none;" data-bs-dismiss="alert">
+        <span aria-hidden="true" style="border-style : 0;">&times;</span>
+      </button>
+    </div>
+    {% else %}
+    <div class="alert alert-success alter-dismissable fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" style="border-style : none;" data-bs-dismiss="alert">
+        <span aria-hidden="true" style="border-style : 0;">&times;</span>
+      </button>
+    </div>
+    {% endif %} {% endfor %} {% endif %} {% endwith %}
+    <div class="row">
+        <div class="sidebar col-md-2 mt-2">
+            <ul class="databases">
+                <li><span class="database tree icon"><p class="underline-animation">Database</p></span>
+                    <ul class="tables tree-node">
+                        {% for table, keys in schema.items() %}
+                        <li><span class="table tree icon"><p class="underline-animation"> {{ table }} </p></span>
+                            <ul class="keys tree-node">
+                            {% for key in keys %}
+                                <li><span class="key icon"><p class="underline-animation"> {{ key }} </p></span></li>
+                            {% endfor %}
+                            </ul>
+                        </li>
+                        {% endfor%}
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="col-md-5 container-fluid">
+            <h1> Query </h1>
+            <br>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="query">Enter Your Query Here!</label><br>
+                    <textarea class="form-control mt-1" id="query" name="query" placeholder="Click example query or enter your query here!"></textarea>
+                </div>
+
+            
+                <button class="btn btn-danger mt-1" type="submit" value="submit">VISUALIZE</button>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary dropdown-toggle mt-1" data-bs-toggle="dropdown" aria-expanded="false">
+                        Load Query
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for name, query in queries.items() %}
+                        <li>
+                            <a class="dropdown-item query-dropdown" href="#">
+                                {{ name }}
+                                <span class="sql-query hidden"> {{ query }}</span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-md-5 container-fluid">
+            <!-- Plot Location (Open another tab to view)
+            <div class="plot-location" style="width:400px">
+                {% if plot == 0 %}
+                    <p> Start query to see graph!</p>
+                {% else %}
+                    <img src="{{  url_for('static', filename = 'graph.png') }}" style="width: 100%;">
+                {% endif %}
+            </div> -->
+            <span class="hidden"></span>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <span class="hidden"></span>
+        </div>
+
+        <div class="col-md-6 container-fluid">
+            <h1>Results</h1>
+            <p>Parsed Query (Hover to see details!)</p>
+            <div class="border rounded border-dark container-fluid"">
+                {% if sql is none %}
+                    <p>There is no input currently!</p>
+                {% else %}
+                    {% for section, list in sql.items() %}
+                        {% if list | length > 0 %}
+                        <p> 
+                            {% if ((section|upper == 'SELECT') or (section|upper == 'FROM')) %}
+                            <span><strong>{{ section|upper }}</strong></span> <br>
+                                {% for key, values in list.items() %}
+                                <span class="keyword">
+                                    <span class="{{ section|upper}} {{key}} hidden">{{values[1]}}</span>
+                                    {% if key != values[0] %}
+                                        {{ key }} as {{ values[0] }} <br>
+                                    {% else %}
+                                        {{ key }}<br>
+                                    {% endif %}
+                                </span>
+                                {% endfor %}
+                            {% elif ((section|upper) == 'WHERE' or (section|upper) == 'FROM_JOIN') %}
+                            <span><strong>{{ section|upper }}</strong></span> <br>
+                                {% for key, value in list.items() %}
+                                <span class="keyword">
+                                    <span class="{{ section|upper}} {{key}} hidden">{{ value }}</span>
+                                    {{ key }} <br> 
+                                </span>
+                                {% endfor %}
+                            {% elif (section|upper == 'ORDER_BY') or (section|upper == 'GROUP_BY') %}
+                            <span><strong>{{ section|upper }}</strong></span> <br>
+                                {% for  key, value in list.items() %}
+                                <span class="keyword">
+                                    <span class="{{ section|upper}} {{key}} hidden">{{ value }}</span>
+                                    {{ key }} <br> 
+                                </span>
+                                {% endfor %}
+                            {% elif section|upper == 'SUBQUERIES' %}
+                            
+                            {% elif section|upper == 'LIMIT'%}
+
+                            {% else %}
+                            <span><strong>{{ section|upper }}</strong></span> <br>
+                                {% for i in range(list|length) %}
+                                <span class="keyword">
+                                    <span class="{{ section|upper}} {{key}} hidden"> </span>
+                                    {{ list[i] }} 
+                                    {% if i < (list|length)-1 %}
+                                    , 
+                                    {% endif %}
+                                    <br> 
+                                </span>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                    {% endfor %}
+                    ;
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-4 container-fluid">
+            <h1 style="color: #ffffff;">hi</h1>
+            <p>Annotation</p>
+            <div id="annotation" class="border rounded border-dark container-fluid">
+                Hover anywhere to see annotation!
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <span class="hidden"></span>
+        </div>
+
+        <div class="col-md-10 container-fluid">
+            <h1>Plot</h1>
+            <div class="plot-location">
+                {% if plot == 0 %}
+                    <p> Start query to see graph!</p>
+                {% else %}
+                    <img src="{{  url_for('static', filename = 'graph.png') }}" style="width: 100%;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script src="{{ url_for('static',filename='schemaToggle.js') }}"></script>
+    <script src="{{ url_for('static',filename='fillQuery.js') }}"></script>
+    <script src="{{ url_for('static',filename='hoverAnnotation.js') }}"></script>
+</body>
+</html>
